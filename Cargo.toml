@@ -1,0 +1,17 @@
+[package]
+name = "rust-hackathon"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+askama = { version = "0.12.0", features = ["with-axum"] }
+askama_axum = "0.3.0"
+axum = "0.6.20"
+serde = { version = "1.0.188", features = ["derive"] }
+sqlx = { version = "0.7.1", features = ["sqlite", "runtime-tokio", "macros", "sqlx-sqlite"] }
+tokio = { version = "1.32.0", features = ["full"] }
+tower-http = { version = "0.4.4", features = ["trace", "fs"] }
+tracing = "0.1.37"
+tracing-subscriber = "0.3.17"
