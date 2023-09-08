@@ -21,7 +21,7 @@ impl Db {
     ) -> Result<models::User, Box<dyn DatabaseError>> {
         let user = sqlx::query_as!(
             models::User,
-            "INSERT INTO users (username, email) VALUES (?, ?) RETURNING id, username, email",
+            "INSERT INTO users (username, email) VALUES ($1, $2) RETURNING *",
             new_user.username,
             new_user.email,
         )
@@ -36,7 +36,7 @@ impl Db {
     }
 
     pub async fn get_user(&self, id: i64) -> Option<models::User> {
-        sqlx::query_as!(models::User, "SELECT * FROM users WHERE id = ?", id,)
+        sqlx::query_as!(models::User, "SELECT * FROM users WHERE id = $1", id,)
             .fetch_optional(&self.pool)
             .await
             .unwrap()
