@@ -1,3 +1,5 @@
+use sqlx::error::DatabaseError;
+
 use crate::models;
 
 #[derive(Debug)]
@@ -13,21 +15,29 @@ impl Db {
             .unwrap()
     }
 
-    pub async fn add_user(&self, new_user: models::NewUser) -> models::User {
-        sqlx::query_as!(
+    pub async fn add_user(
+        &self,
+        new_user: models::NewUser,
+    ) -> Result<models::User, Box<dyn DatabaseError>> {
+        let user = sqlx::query_as!(
             models::User,
             "INSERT INTO users (username, email) VALUES (?, ?) RETURNING id, username, email",
             new_user.username,
             new_user.email,
         )
         .fetch_one(&self.pool)
-        .await
-        .unwrap()
+        .await;
+
+        match user {
+            Ok(user) => Ok(user),
+            Err(sqlx::Error::Database(db_error)) => Err(db_error),
+            Err(e) => panic!("{}", e),
+        }
     }
 
-    pub async fn get_user(&self, id: i64) -> models::User {
+    pub async fn get_user(&self, id: i64) -> Option<models::User> {
         sqlx::query_as!(models::User, "SELECT * FROM users WHERE id = ?", id,)
-            .fetch_one(&self.pool)
+            .fetch_optional(&self.pool)
             .await
             .unwrap()
     }
