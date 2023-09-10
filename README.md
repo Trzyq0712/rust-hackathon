@@ -3,6 +3,7 @@
 - `src/db` - Contains code responsible for accessing the database.
 - `src/api` - Defines the API endpoints.
 - `src/frontend` - Responsible for serving the frontend.
+- `src/models` - Contains relevant datatypes used throughout the server.
 - `templates` - Contains html templates that are served by the frontend.
 - `static` - Contains static files that will be served by the webserver.
 

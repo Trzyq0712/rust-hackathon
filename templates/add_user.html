@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Add user</h1>
+<form action="/add_user" method="post">
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username">
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email">
+    <input type="submit" value="Create user">
+</form>
+{% if let Some(message) = message %}
+<p>{{ message }}</p>
+{% endif %}
+{% endblock %}

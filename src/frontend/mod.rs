@@ -1,17 +1,18 @@
 use askama::Template;
 use axum::extract::{Query, State};
-use axum::response::IntoResponse;
+use axum::response::{IntoResponse, Redirect};
 use axum::routing::get;
-use axum::{debug_handler, Router};
+use axum::{debug_handler, Form, Router};
 use serde::Deserialize;
 
-use crate::models::{Article, User};
+use crate::models::{Article, NewUser, User};
 use crate::{db, AppState};
 
 pub fn frontend_router() -> Router<AppState> {
     Router::new()
         .route("/users", get(users))
         .route("/articles", get(articles))
+        .route("/add_user", get(add_user_page).post(add_user))
 }
 
 #[derive(Template)]
@@ -64,5 +65,26 @@ async fn articles(
     ArticlesTemplate {
         author: Some(author_name),
         articles,
+    }
+}
+
+#[derive(Template)]
+#[template(path = "add_user.html")]
+struct AddUserTemplate {
+    message: Option<String>,
+}
+
+async fn add_user_page() -> impl IntoResponse {
+    AddUserTemplate { message: None }
+}
+
+async fn add_user(State(db): State<db::Db>, Form(new_user): Form<NewUser>) -> impl IntoResponse {
+    let user = db.add_user(new_user).await;
+    match user {
+        Err(_) => AddUserTemplate {
+            message: Some("Email is already taken".to_string()),
+        }
+        .into_response(),
+        Ok(_) => Redirect::to("/users").into_response(),
     }
 }
