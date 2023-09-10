@@ -1,3 +1,11 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Articles</title>
+{% endblock %}
+
+{% block content %}
+
 {% if let Some(name) = author %}
 <h1>{{ name }}</h1>
 {% else %}
@@ -10,3 +18,5 @@
     <p>{{ article.text }}</p>
 </article>
 {% endfor %}
+    
+{% endblock %}
