@@ -17,3 +17,5 @@
 ### Frontend (`/`)
 - `GET /users`
 - `GET /articles` with optional query parameter `author_id`
+- `GET /add_user`
+- `POST /add_user`
