@@ -1,0 +1,12 @@
+{% if let Some(name) = author %}
+<h1>{{ name }}</h1>
+{% else %}
+<h1>All articles</h1>
+{% endif %}
+
+{% for article in articles %}
+<article>
+    <h2>{{ article.title }}</h2>
+    <p>{{ article.text }}</p>
+</article>
+{% endfor %}

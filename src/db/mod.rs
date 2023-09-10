@@ -41,6 +41,48 @@ impl Db {
             .await
             .unwrap()
     }
+
+    pub async fn all_articles(&self) -> Vec<models::Article> {
+        sqlx::query_as!(models::Article, "SELECT * FROM articles")
+            .fetch_all(&self.pool)
+            .await
+            .unwrap()
+    }
+
+    pub async fn articles_by_author(&self, author_id: i64) -> Vec<models::Article> {
+        sqlx::query_as!(
+            models::Article,
+            "SELECT * FROM articles WHERE author = $1",
+            author_id,
+        )
+        .fetch_all(&self.pool)
+        .await
+        .unwrap()
+    }
+
+    pub async fn add_article(
+        &self,
+        new_article: models::NewArticle,
+    ) -> Result<models::Article, String> {
+        let article = sqlx::query_as!(
+            models::Article,
+            "INSERT INTO articles (title, text, author) VALUES ($1, $2, $3) RETURNING *",
+            new_article.title,
+            new_article.text,
+            new_article.author,
+        )
+        .fetch_one(&self.pool)
+        .await;
+
+        match article {
+            Ok(article) => Ok(article),
+            Err(sqlx::Error::Database(db_error)) => {
+                let message = db_error.message();
+                Err(message.to_string())
+            }
+            Err(e) => panic!("{}", e),
+        }
+    }
 }
 
 pub async fn init() -> Db {
