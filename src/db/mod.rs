@@ -2,7 +2,7 @@ use sqlx::error::DatabaseError;
 
 use crate::models;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Db {
     pool: sqlx::SqlitePool,
 }

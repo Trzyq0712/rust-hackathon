@@ -13,6 +13,7 @@ serde = { version = "1.0.188", features = ["derive"] }
 sqlx = { version = "0.7.1", features = ["sqlite", "runtime-tokio", "macros", "sqlx-sqlite"] }
 thiserror = "1.0.48"
 tokio = { version = "1.32.0", features = ["full"] }
+tower = "0.4.13"
 tower-http = { version = "0.4.4", features = ["trace", "fs"] }
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"

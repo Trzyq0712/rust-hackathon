@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use askama::Template;
 use askama_axum::IntoResponse;
 use axum::extract::State;
@@ -20,7 +18,7 @@ struct UsersTemplate {
 }
 
 #[debug_handler]
-async fn users(State(db): State<Arc<db::Db>>) -> impl IntoResponse {
+async fn users(State(db): State<db::Db>) -> impl IntoResponse {
     let users = db.all_users().await;
     UsersTemplate { users }
 }

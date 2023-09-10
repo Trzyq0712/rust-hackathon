@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::debug_handler;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
@@ -18,14 +16,14 @@ pub fn api_router() -> Router<AppState> {
 }
 
 #[debug_handler]
-async fn all_users(State(db): State<Arc<db::Db>>) -> Json<Vec<models::User>> {
+async fn all_users(State(db): State<db::Db>) -> Json<Vec<models::User>> {
     let users = db.all_users().await;
     axum::Json(users)
 }
 
 #[debug_handler]
 async fn add_user(
-    State(db): State<Arc<db::Db>>,
+    State(db): State<db::Db>,
     Json(new_user): Json<models::NewUser>,
 ) -> Result<(StatusCode, Json<models::User>), StatusCode> {
     let user = db.add_user(new_user).await;
@@ -37,7 +35,7 @@ async fn add_user(
 
 #[debug_handler]
 async fn get_user(
-    State(db): State<Arc<db::Db>>,
+    State(db): State<db::Db>,
     Path(id): Path<u64>,
 ) -> Result<Json<models::User>, StatusCode> {
     let user = db.get_user(id as i64).await;
