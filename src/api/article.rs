@@ -6,7 +6,10 @@ use axum::{
 };
 use serde::Deserialize;
 
-use crate::{db, models};
+use crate::{
+    db::{self, DbError},
+    models,
+};
 
 #[debug_handler]
 pub(super) async fn all_articles(
@@ -30,10 +33,7 @@ pub(super) struct Author {
 pub(super) async fn add_article(
     State(db): State<db::Db>,
     Json(new_article): Json<models::NewArticle>,
-) -> Result<(StatusCode, Json<models::Article>), (StatusCode, String)> {
-    let article = db.add_article(new_article).await;
-    match article {
-        Ok(article) => Ok((StatusCode::CREATED, axum::Json(article))),
-        Err(e) => Err((StatusCode::CONFLICT, e)),
-    }
+) -> Result<(StatusCode, Json<models::Article>), DbError> {
+    let article = db.add_article(new_article).await?;
+    Ok((StatusCode::CREATED, axum::Json(article)))
 }

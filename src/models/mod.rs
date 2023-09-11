@@ -27,3 +27,15 @@ pub struct NewArticle {
     pub text: String,
     pub author: i64,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProfilePic {
+    #[serde(rename = "profile_picture")]
+    pub data: Vec<u8>,
+}
+
+impl From<Vec<u8>> for ProfilePic {
+    fn from(data: Vec<u8>) -> Self {
+        Self { data }
+    }
+}

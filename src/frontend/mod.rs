@@ -30,7 +30,7 @@ async fn users(State(db): State<db::Db>) -> impl IntoResponse {
 #[derive(Template)]
 #[template(path = "articles.html")]
 struct ArticlesTemplate {
-    author: Option<String>,
+    author: Option<User>,
     articles: Vec<Article>,
 }
 
@@ -43,27 +43,24 @@ async fn articles(
     State(db): State<db::Db>,
     Query(Author { author_id }): Query<Author>,
 ) -> impl IntoResponse {
-    if author_id.is_none() {
+    let Some(author_id) = author_id else {
         let articles = db.all_articles().await;
         return ArticlesTemplate {
             author: None,
             articles,
         };
-    }
-    let author = db.get_user(author_id.unwrap() as i64).await;
-    let author_name = match author {
-        Some(user) => user.username,
-        None => {
-            return ArticlesTemplate {
-                author: Some("--No such author--".to_string()),
-                articles: vec![],
-            }
-        }
     };
-    let articles = db.articles_by_author(author_id.unwrap() as i64).await;
+    let author = db.get_user(author_id as i64).await;
+    let Ok(author) = author else {
+        return ArticlesTemplate {
+            author: None,
+            articles: vec![],
+        };
+    };
+    let articles = db.articles_by_author(author_id as i64).await;
 
     ArticlesTemplate {
-        author: Some(author_name),
+        author: Some(author),
         articles,
     }
 }

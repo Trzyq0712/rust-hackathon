@@ -6,8 +6,9 @@
 
 {% block content %}
 
-{% if let Some(name) = author %}
-<h1>{{ name }}</h1>
+{% if let Some(user) = author %}
+<h1>{{ user.username }}</h1>
+<img height="100px" src="/api/user/{{ user.id }}/profile_pic">
 {% else %}
 <h1>All articles</h1>
 {% endif %}
