@@ -1,8 +1,8 @@
 use askama::Template;
-use axum::extract::{Query, State};
-use axum::response::{IntoResponse, Redirect};
+use axum::extract::{Multipart, Query, State};
+use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get;
-use axum::{debug_handler, Form, Router};
+use axum::{debug_handler, Router};
 use serde::Deserialize;
 
 use crate::models::{Article, NewUser, User};
@@ -23,7 +23,8 @@ struct UsersTemplate {
 
 #[debug_handler]
 async fn users(State(db): State<db::Db>) -> impl IntoResponse {
-    let users = db.all_users().await;
+    let mut users = db.all_users().await;
+    users.sort_by_key(|u| u.id);
     UsersTemplate { users }
 }
 
@@ -75,13 +76,38 @@ async fn add_user_page() -> impl IntoResponse {
     AddUserTemplate { message: None }
 }
 
-async fn add_user(State(db): State<db::Db>, Form(new_user): Form<NewUser>) -> impl IntoResponse {
-    let user = db.add_user(new_user).await;
-    match user {
-        Err(_) => AddUserTemplate {
-            message: Some("Email is already taken".to_string()),
+async fn add_user(State(db): State<db::Db>, mut new_user: Multipart) -> Response {
+    let mut email = None;
+    let mut username = None;
+    let mut profile_pic = None;
+
+    while let Some(field) = new_user.next_field().await.unwrap() {
+        if field.name().unwrap() == "email" {
+            email = Some(field.text().await.unwrap());
+        } else if field.name().unwrap() == "username" {
+            username = Some(field.text().await.unwrap());
+        } else if field.name().unwrap() == "profile_picture" {
+            profile_pic = Some(field.bytes().await.unwrap());
         }
-        .into_response(),
-        Ok(_) => Redirect::to("/users").into_response(),
+    }
+    let (Some(email), Some(username)) = (email, username) else {
+        return AddUserTemplate {
+            message: Some("Email and username are required".to_string()),
+        }
+        .into_response();
+    };
+    let new_user = NewUser {
+        email,
+        username,
+        profile_picture: profile_pic.map(|p| p.to_vec()),
+    };
+    let user = db.add_user(new_user).await;
+    if user.is_err() {
+        AddUserTemplate {
+            message: Some("Failed to add user".to_string()),
+        }
+        .into_response()
+    } else {
+        Redirect::to("/users").into_response()
     }
 }

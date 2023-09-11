@@ -26,9 +26,10 @@ impl Db {
     pub async fn add_user(&self, new_user: models::NewUser) -> Result<models::User, DbError> {
         let user = sqlx::query_as!(
             models::User,
-            "INSERT INTO users (username, email) VALUES ($1, $2) RETURNING id, username, email",
+            "INSERT INTO users (username, email, profile_picture) VALUES ($1, $2, $3) RETURNING id, username, email",
             new_user.username,
             new_user.email,
+            new_user.profile_picture,
         )
         .fetch_one(&self.pool)
         .await;

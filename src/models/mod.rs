@@ -11,6 +11,7 @@ pub struct User {
 pub struct NewUser {
     pub username: String,
     pub email: String,
+    pub profile_picture: Option<Vec<u8>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
