@@ -1,8 +1,9 @@
 use askama::Template;
-use axum::extract::{Multipart, Query, State};
+use axum::extract::{DefaultBodyLimit, Query, State};
 use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get;
 use axum::{debug_handler, Router};
+use axum_typed_multipart::TypedMultipart;
 use serde::Deserialize;
 
 use crate::models::{Article, NewUser, User};
@@ -13,6 +14,7 @@ pub fn frontend_router() -> Router<AppState> {
         .route("/users", get(users))
         .route("/articles", get(articles))
         .route("/add_user", get(add_user_page).post(add_user))
+        .layer(DefaultBodyLimit::max(1024 * 1024 * 32))
 }
 
 #[derive(Template)]
@@ -76,31 +78,10 @@ async fn add_user_page() -> impl IntoResponse {
     AddUserTemplate { message: None }
 }
 
-async fn add_user(State(db): State<db::Db>, mut new_user: Multipart) -> Response {
-    let mut email = None;
-    let mut username = None;
-    let mut profile_pic = None;
-
-    while let Some(field) = new_user.next_field().await.unwrap() {
-        if field.name().unwrap() == "email" {
-            email = Some(field.text().await.unwrap());
-        } else if field.name().unwrap() == "username" {
-            username = Some(field.text().await.unwrap());
-        } else if field.name().unwrap() == "profile_picture" {
-            profile_pic = Some(field.bytes().await.unwrap());
-        }
-    }
-    let (Some(email), Some(username)) = (email, username) else {
-        return AddUserTemplate {
-            message: Some("Email and username are required".to_string()),
-        }
-        .into_response();
-    };
-    let new_user = NewUser {
-        email,
-        username,
-        profile_picture: profile_pic.map(|p| p.to_vec()),
-    };
+async fn add_user(
+    State(db): State<db::Db>,
+    TypedMultipart(new_user): TypedMultipart<NewUser>,
+) -> Response {
     let user = db.add_user(new_user).await;
     if user.is_err() {
         AddUserTemplate {

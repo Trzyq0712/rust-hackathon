@@ -9,6 +9,7 @@ edition = "2021"
 askama = { version = "0.12.0", features = ["with-axum"] }
 askama_axum = "0.3.0"
 axum = { version = "0.6.20", features = ["macros", "query", "multipart", "headers"] }
+axum_typed_multipart = "0.9.0"
 serde = { version = "1.0.188", features = ["derive"] }
 sqlx = { version = "0.7.1", features = ["sqlite", "runtime-tokio", "macros", "sqlx-sqlite"] }
 thiserror = "1.0.48"

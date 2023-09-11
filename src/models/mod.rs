@@ -1,3 +1,4 @@
+use axum_typed_multipart::TryFromMultipart;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -7,11 +8,13 @@ pub struct User {
     pub email: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(TryFromMultipart, Debug, Deserialize)]
 pub struct NewUser {
     pub username: String,
     pub email: String,
-    pub profile_picture: Option<Vec<u8>>,
+    #[serde(skip)]
+    #[form_data(limit = "32MB")]
+    pub profile_picture: Option<axum::body::Bytes>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
