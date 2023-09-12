@@ -1,15 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Add user</h1>
-<form action="/add_user" method="post" enctype="multipart/form-data">
-    <label for="username">Username</label>
-    <input type="text" name="username" id="username">
-    <label for="email">Email</label>
-    <input type="email" name="email" id="email">
-    <input type="file" name="profile_picture" id="avatar">
-    <input type="submit" value="Create user">
-</form>
-{% if let Some(message) = message %}
-<p>{{ message }}</p>
-{% endif %}
+<div class="flex justify-center">
+    <div class="w-1/2 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form action="/users/create" method="post" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                    Username
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                       id="username" name="username" type="text" placeholder="Username">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                    Email
+                </label>
+                <input class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700
+                mb-3 leading-tight" id="email" name="email" type="email" placeholder="Email">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="avatar">
+                    Avatar
+                </label>
+                <input type="file" name="profile_picture" id="avatar" class="form-control">
+            </div>
+            <div class="flex items-center justify-between">
+                <input type="submit" value="Add user" class="bg-blue-500 hover:bg-blue-700 text-white font-bold
+                py-2 px-4 rounded">
+            </div>
+        </form>
+        {% if let Some(message) = message %}
+        <p>{{ message }}</p>
+        {% endif %}
+    </div>
 {% endblock %}

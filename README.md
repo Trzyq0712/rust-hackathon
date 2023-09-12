@@ -13,9 +13,10 @@
 - `POST /article`
 - `GET /users`
 - `GET /user/:id`
+- `GET /user/:id/profile_pic`
 - `POST /user`
 ### Frontend (`/`)
 - `GET /users`
 - `GET /articles` with optional query parameter `author_id`
-- `GET /add_user`
-- `POST /add_user`
+- `GET /users/create`
+- `POST /users/create`

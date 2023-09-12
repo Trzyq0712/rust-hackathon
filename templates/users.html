@@ -1,15 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Users</h1>
-<table>
+
+<h1 class="text-3xl font-bold mb-4">Users</h1>
+<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    <a href="/users/create">Create User</a>
+</button>
+<table class="w-full border-collapse border-spacing-2 border">
+    <thead>
+    <tr>
+        <th class="border">ID</th>
+        <th class="border">Username</th>
+        <th class="border">Email</th>
+    </thead>
+    <tbody>
     {% for user in users %}
     <tr>
-        <td>{{ user.id }}</td>
-        <td><a href="/articles?author_id={{ user.id }}">
+        <td class="border w-1/8">{{ user.id }}</td>
+        <td class="border w-3/8"><a href="/articles?author_id={{ user.id }}">
                 {{ user.username }}
             </a></td>
-        <td>{{ user.email }}</td>
+        <td class="border w-4/8">{{ user.email }}</td>
     </tr>
     {% endfor %}
+    </tbody>
 </table>
+
 {% endblock %}

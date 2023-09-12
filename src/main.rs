@@ -25,7 +25,6 @@ async fn main() {
         .nest("/", frontend::frontend_router())
         .with_state(app_state)
         .nest_service("/static", ServeDir::new("static"))
-        .layer(DefaultBodyLimit::max(1024 * 1024 * 32))
         .layer(logger());
 
     let socket = ([0, 0, 0, 0], PORT).into();

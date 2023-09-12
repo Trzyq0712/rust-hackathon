@@ -13,7 +13,7 @@ pub fn frontend_router() -> Router<AppState> {
     Router::new()
         .route("/users", get(users))
         .route("/articles", get(articles))
-        .route("/add_user", get(add_user_page).post(add_user))
+        .route("/users/create", get(add_user_page).post(add_user))
         .layer(DefaultBodyLimit::max(1024 * 1024 * 32))
 }
 

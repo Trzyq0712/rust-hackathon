@@ -46,11 +46,11 @@ pub(super) async fn get_user(
 }
 
 #[debug_handler]
-pub(super) async fn user_profile_pic(
+pub(super) async fn user_avatar(
     State(db): State<db::Db>,
     Path(id): Path<u64>,
 ) -> Result<(HeaderMap, Vec<u8>), DbError> {
-    let pic = db.get_profile_pic(id as i64).await?;
+    let pic = db.get_avatar(id as i64).await?;
 
     let mut headers = HeaderMap::new();
     headers.insert(header::CONTENT_TYPE, "image/jpeg".parse().unwrap());

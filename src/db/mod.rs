@@ -57,7 +57,7 @@ impl Db {
         .ok_or(DbError::DoesNotExist(format!("User with id {}", id)))
     }
 
-    pub async fn get_profile_pic(&self, id: i64) -> Result<models::ProfilePic, DbError> {
+    pub async fn get_avatar(&self, id: i64) -> Result<models::ProfilePic, DbError> {
         let data = sqlx::query!(
             r#"SELECT profile_picture AS "data?" FROM users WHERE id = $1"#,
             id,

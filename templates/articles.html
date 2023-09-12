@@ -8,7 +8,7 @@
 
 {% if let Some(user) = author %}
 <h1>{{ user.username }}</h1>
-<img height="100px" src="/api/user/{{ user.id }}/profile_pic">
+<img src="/api/user/{{ user.id }}/avatar" class="rounded-circle mb-3 max-h-16">
 {% else %}
 <h1>All articles</h1>
 {% endif %}
