@@ -1,5 +1,6 @@
-use axum::extract::{DefaultBodyLimit, FromRef};
+use axum::extract::FromRef;
 use axum::{Router, Server};
+use pyo3::prelude::*;
 use tower_http::{services::ServeDir, trace, trace::TraceLayer};
 use tracing::Level;
 
@@ -30,6 +31,9 @@ async fn main() {
     let socket = ([0, 0, 0, 0], PORT).into();
     tracing::info!("Starting server on {}", socket);
 
+    py_setup();
+    println!("Hello, world! The square root of 25 is {}", py_sqrt(25.0));
+
     Server::bind(&socket)
         .serve(app.into_make_service())
         .await
@@ -49,4 +53,24 @@ fn logger(
         .on_failure(trace::DefaultOnFailure::new().level(Level::ERROR))
         .on_response(trace::DefaultOnResponse::new().level(Level::INFO))
         .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
+}
+
+fn py_setup() {
+    let py_hello = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/python/hello.py"));
+    Python::with_gil(|py| -> PyResult<()> {
+        // Creates a module called `hello` that can be imported in the python runtime later
+        PyModule::from_code(py, py_hello, "hello.py", "hello")?;
+        Ok(())
+    })
+    .unwrap();
+}
+
+fn py_sqrt(x: f64) -> f64 {
+    Python::with_gil(|py| -> PyResult<f64> {
+        let hello_mod = py.import("hello")?;
+        let sqrt = hello_mod.getattr("square_root")?;
+        let res: f64 = sqrt.call1((x,))?.extract()?;
+        Ok(res)
+    })
+    .unwrap()
 }
